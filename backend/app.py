@@ -536,4 +536,6 @@ if __name__ == "__main__":
     os.makedirs(MODELS_DIR, exist_ok=True)
     print(f"  Models expire after {MODEL_EXPIRY_HOURS} hours.")
     print(f"  Serving frontend from: {FRONTEND_DIR}")
-    app.run(debug=True, port=5000, use_reloader=False)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+

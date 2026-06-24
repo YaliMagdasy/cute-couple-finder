@@ -7,3 +7,4 @@ Flask
 flask-cors
 Pillow
 APScheduler
+gunicorn
