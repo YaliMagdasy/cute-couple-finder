@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Couple Finder - Demo</title>
+    <meta name="description" content="See the Cute Couple Finder in action. A simulation trained on Brad Pitt and Scarlett Johansson.">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* ═══════ DEMO-SPECIFIC STYLES ═══════ */
+
+        .demo-banner {
+            background: var(--accent-gradient-soft);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.6s ease both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .demo-banner .demo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-violet);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .demo-banner h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-banner p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-banner .celeb-names {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .celeb-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+        }
+
+        .celeb-tag img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .celeb-tag .celeb-info {
+            text-align: left;
+        }
+
+        .celeb-tag .celeb-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .celeb-tag .celeb-role {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .celeb-heart {
+            font-size: 1.2rem;
+            animation: heartBeat 1.5s ease-in-out infinite;
+        }
+
+        /* ═══════ CANDIDATE POOL ═══════ */
+
+        .pool-section {
+            animation: fadeUp 0.6s ease both;
+            animation-delay: 0.2s;
+        }
+
+        .pool-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .pool-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pool-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .candidate-pool {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+            gap: 8px;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: var(--radius-lg);
+            max-height: 360px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .candidate-pool::-webkit-scrollbar { width: 4px; }
+        .candidate-pool::-webkit-scrollbar-track { background: transparent; }
+        .candidate-pool::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+        .pool-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: grab;
+            border: 2px solid transparent;
+            transition: all var(--transition-fast);
+            background: rgba(255, 255, 255, 0.03);
+            user-select: none;
+        }
+
+        .pool-item:active { cursor: grabbing; }
+
+        .pool-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            transition: transform var(--transition-smooth);
+        }
+
+        .pool-item:hover img { transform: scale(1.08); }
+
+        .pool-item:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .pool-item.selected {
+            border-color: var(--accent-pink);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .pool-item .pool-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2px 4px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            font-size: 0.58rem;
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pool-item .pool-label.celeb {
+            background: linear-gradient(transparent, rgba(244,63,94,0.7));
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ═══════ DROP ZONES ═══════ */
+
+        .demo-zones {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.6s ease both;
+            animation-delay: 0.35s;
+        }
+
+        @media (max-width: 720px) {
+            .demo-zones {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .demo-drop-zone {
+            min-height: 180px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            background: var(--bg-surface);
+            transition: all var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .demo-drop-zone.drag-over {
+            border-color: var(--accent-pink);
+            background: rgba(244, 63, 94, 0.06);
+            transform: scale(1.02);
+        }
+
+        .demo-drop-zone .zone-icon {
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+
+        .demo-drop-zone .zone-label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .demo-drop-zone .zone-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Partner zone with preview */
+        .partner-zone-preview {
+            display: none;
+            width: 100%;
+            position: relative;
+        }
+
+        .partner-zone-preview img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .partner-zone-preview .pzp-name {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            padding: 4px 10px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+        }
+
+        .partner-zone-preview .pzp-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.85);
+            color: white;
+            border: 2px solid var(--bg-deep);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            padding: 0;
+        }
+
+        .partner-zone-preview .pzp-remove:hover {
+            background: #dc2626;
+        }
+
+        /* Candidates drop zone */
+        .candidates-drop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+            gap: 6px;
+            width: 100%;
+            padding: 0.5rem;
+        }
+
+        .candidates-drop-grid .dropped-cell {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .candidates-drop-grid .dropped-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .candidates-drop-grid .dropped-cell .dc-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.85);
+            color: white;
+            border: 2px solid var(--bg-deep);
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all var(--transition-fast);
+            z-index: 5;
+            padding: 0;
+        }
+
+        .candidates-drop-grid .dropped-cell:hover .dc-remove {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .candidates-drop-grid .dropped-cell .dc-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1px 3px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* ═══════ DEMO BACK LINK ═══════ */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color var(--transition-fast);
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--text-secondary);
+        }
+
+        /* ═══════ NOT READY STATE ═══════ */
+        .demo-not-ready {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .demo-not-ready .nr-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .demo-not-ready h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-not-ready p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 420px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .demo-not-ready code {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: var(--accent-rose);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating hearts background -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <div class="app">
+
+        <a href="/" class="back-link">← Back to Home</a>
+
+        <!-- Header -->
+        <header class="header">
+            <h1>💕 Cute Couple Finder</h1>
+        </header>
+
+        <!-- Not ready state (shown if demo model doesn't exist) -->
+        <div class="demo-not-ready hidden" id="notReadyPanel">
+            <div class="nr-icon">🔧</div>
+            <h2>Demo Not Set Up Yet</h2>
+            <p>
+                The demo needs a pre-trained model on Brad Pitt & Scarlett Johansson.
+                Run the setup script first:
+            </p>
+            <code>cd backend && python setup_demo.py</code>
+        </div>
+
+        <!-- Main demo content -->
+        <div id="demoContent">
+
+            <!-- Demo explanation banner -->
+            <div class="demo-banner">
+                <div class="demo-badge">✨ Live Simulation</div>
+                <h2>This demo was trained on Brad Pitt & Scarlett Johansson</h2>
+                <p>
+                    The AI has learned their faces. Drag a photo into the <strong>"Partner"</strong> zone and 
+                    candidates into the <strong>"Candidates"</strong> zone, then hit Match. If you pick Brad or Scarlett 
+                    as the partner - the AI will find the other one as their perfect match. don't worry about a missing partner - we made sure only you will be compatible to each other.
+                    That's exactly how it works when you create a surprise for your real partner! 
+                </p>
+                <div class="celeb-names">
+                    <div class="celeb-tag">
+                        <img src="/demo-img/brad" alt="Brad Pitt" id="bradThumb">
+                        <div class="celeb-info">
+                            <div class="celeb-name">Brad Pitt</div>
+                            <div class="celeb-role">Person 1</div>
+                        </div>
+                    </div>
+                    <div class="celeb-heart">💕</div>
+                    <div class="celeb-tag">
+                        <img src="/demo-img/scarlett" alt="Scarlett Johansson" id="scarlettThumb">
+                        <div class="celeb-info">
+                            <div class="celeb-name">Scarlett Johansson</div>
+                            <div class="celeb-role">Person 2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate pool -->
+            <div class="pool-section">
+                <div class="pool-header">
+                    <h3>💎 Partner Pool</h3>
+                    <span class="pool-hint">Drag photos to the zones below</span>
+                </div>
+                <div class="candidate-pool" id="candidatePool">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Drop zones -->
+            <div class="mode-switcher">
+                <button type="button" class="mode-btn active" data-mode="find-match">Find Best Match</button>
+                <button type="button" class="mode-btn" data-mode="suitability">Suitability Percentage</button>
+            </div>
+
+            <div class="modes-container single-mode">
+                
+                <!-- Mode 1: Find Match -->
+                <div class="mode-section active" id="mode-find-match">
+                    <form id="demoForm" autocomplete="off">
+                        <div class="demo-zones" style="grid-template-columns: 1fr;">
+                            <!-- Partner zone -->
+                            <div class="card">
+                                <div class="section-label">💎 Partner (Test Subject)</div>
+                                <div class="demo-drop-zone" id="partnerDropZone">
+                                    <div class="zone-icon">🎯</div>
+                                    <div class="zone-label">Drag a face here</div>
+                                    <div class="zone-hint">This person will be identified</div>
+                                </div>
+                                <div class="partner-zone-preview" id="partnerZonePreview">
+                                    <img id="partnerZoneImg" alt="Partner">
+                                    <div class="pzp-name" id="partnerZoneName"></div>
+                                    <button type="button" class="pzp-remove" id="partnerZoneRemove">×</button>
+                                </div>
+                            </div>
+
+                            <!-- Candidates zone -->
+                            <div class="card">
+                                <div class="section-label" style="margin-bottom: 0.25rem;">
+                                    👥 Candidates
+                                    <span class="candidate-count" id="droppedCount">0 people</span>
+                                </div>
+                                <div class="demo-drop-zone" id="candidatesDropZone" style="min-height: 220px; align-items: stretch; justify-content: flex-start; padding: 0; margin-bottom: 10px;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 6px;" id="candidatesPlaceholder">
+                                        <div class="zone-icon">👥</div>
+                                        <div class="zone-label">Drag candidates here</div>
+                                        <div class="zone-hint">Add people to compare against</div>
+                                    </div>
+                                    <div class="candidates-drop-grid" id="candidatesDropGrid"></div>
+                                </div>
+                                <div class="add-bar" style="display: flex; gap: 10px;">
+                                    <button type="button" class="add-bar-btn" id="demoAddRandomBtn" style="flex: 1;">Add random candidates</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="cta" id="demoSubmitBtn" style="animation-delay: 0.5s;">
+                            <span class="btn-inner" id="demoBtnInner">💘 Find Best Match</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Mode 2: Couple Test -->
+                <div class="mode-section" id="mode-suitability">
+                    <form id="demoForm2" autocomplete="off">
+                        <div class="demo-zones" style="grid-template-columns: 1fr;">
+                            <!-- Partner 1 zone -->
+                            <div class="card">
+                                <div class="section-label">💎 Partner 1</div>
+                                <div class="demo-drop-zone" id="partner1DropZone">
+                                    <div class="zone-icon">🎯</div>
+                                    <div class="zone-label">Drag a face here</div>
+                                    <div class="zone-hint">First person of the couple</div>
+                                </div>
+                                <div class="partner-zone-preview" id="partner1ZonePreview">
+                                    <img id="partner1ZoneImg" alt="Partner 1">
+                                    <div class="pzp-name" id="partner1ZoneName"></div>
+                                    <button type="button" class="pzp-remove" id="partner1ZoneRemove">×</button>
+                                </div>
+                            </div>
+
+                            <!-- Partner 2 zone -->
+                            <div class="card">
+                                <div class="section-label">💎 Partner 2</div>
+                                <div class="demo-drop-zone" id="partner2DropZone">
+                                    <div class="zone-icon">🎯</div>
+                                    <div class="zone-label">Drag a face here</div>
+                                    <div class="zone-hint">Second person of the couple</div>
+                                </div>
+                                <div class="partner-zone-preview" id="partner2ZonePreview">
+                                    <img id="partner2ZoneImg" alt="Partner 2">
+                                    <div class="pzp-name" id="partner2ZoneName"></div>
+                                    <button type="button" class="pzp-remove" id="partner2ZoneRemove">×</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="cta" id="demoSubmitBtn2" style="animation-delay: 0.5s;">
+                            <span class="btn-inner" id="demoBtnInner2">💘 Calculate Suitability</span>
+                        </button>
+                    </form>
+                </div>
+                
+            </div>
+
+            <div class="error-banner" id="errorBanner"></div>
+
+            <!-- Progress -->
+            <div class="progress-panel" id="progressPanel">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-status" id="progressStatus"></div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-panel" id="resultPanel">
+                <div class="particles" id="particles"></div>
+                <div class="result-emoji" id="resultEmoji"></div>
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-sub" id="resultSub"></div>
+                <div class="match-wrap hidden" id="matchWrap">
+                    <div class="couple-container">
+                        <img class="match-img partner" id="resultPartnerImg" alt="Partner">
+                        <div class="couple-icon">💖</div>
+                        <img class="match-img candidate" id="matchImg" alt="Match">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA to create your own -->
+            <div class="card" style="text-align: center; margin-top: 2rem; padding: 1.5rem; animation: fadeUp 0.6s ease both; animation-delay: 0.6s;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💕</div>
+                <div style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.35rem;">Want to do this with your partner?</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Create your own surprise link - it only takes a few seconds</div>
+                <a href="/" class="cta" style="display: inline-flex; width: auto; padding: 0.75rem 2rem; text-decoration: none;">
+                    <span class="btn-inner">💘 Create Your Surprise</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/demo.js"></script>
+</body>
+
+</html>

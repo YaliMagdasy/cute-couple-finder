@@ -1,0 +1,9 @@
+torch
+torchvision
+facenet-pytorch
+scikit-learn
+opencv-python
+Flask
+flask-cors
+Pillow
+APScheduler

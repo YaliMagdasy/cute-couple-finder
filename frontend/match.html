@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Couple Finder - Match</title>
+    <meta name="description" content="Test the couple matcher - upload a partner photo and find the cutest match from the candidates.">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <!-- Floating hearts background -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- Expired overlay -->
+    <div class="expired-overlay" id="expiredOverlay">
+        <div class="expired-icon">⏰</div>
+        <div class="expired-title">This Link Has Expired</div>
+        <div class="expired-sub">
+            Couple matcher links are only valid for 24 hours to protect your privacy. 
+            Create a new one to start matching again!
+        </div>
+        <a href="/" class="home-link">💕 Create a New Link</a>
+    </div>
+
+    <div class="app">
+
+        <!-- Header -->
+        <header class="header">
+            <h1>💕 Cute Couple Finder</h1>
+            <p style="text-align:center; color:var(--text-muted); margin-top:0.5rem; font-size:0.95rem;">find the best match from the candidates!</p>
+        </header>
+
+        <!-- Match interface -->
+        <div class="mode-switcher">
+            <button type="button" class="mode-btn active" data-mode="find-match">Find Best Match</button>
+            <button type="button" class="mode-btn" data-mode="suitability">Suitability Percentage</button>
+        </div>
+
+        <div class="modes-container single-mode">
+            <div class="mode-section active" id="mode-find-match">
+                <form id="mainForm" autocomplete="off">
+                    <div class="panels" id="panels">
+
+                        <!-- Partner -->
+                        <div class="card" id="partnerCard">
+                            <div class="section-label">💎 Partner</div>
+                            <div class="partner-drop" id="partnerDrop">
+                                <div class="icon">📷</div>
+                                <div class="label">Upload picture</div>
+                                <input type="file" id="partnerInput" accept="image/*" required>
+                            </div>
+                            <div class="partner-preview" id="partnerPreview">
+                                <img id="partnerImg" alt="Partner">
+                                <button type="button" class="change-btn" id="changePartnerBtn">Change</button>
+                            </div>
+                        </div>
+
+                        <!-- Candidates -->
+                        <div class="card" id="candidatesCard">
+                            <div class="candidates-toolbar">
+                                <div class="section-label" style="margin-bottom:0;">👥 Candidates</div>
+                                <span class="candidate-count" id="candidateCount"></span>
+                            </div>
+
+                            <div class="candidate-grid" id="candidateGrid">
+                            </div>
+
+                            <div class="add-bar" style="display: flex; gap: 10px;">
+                                <button type="button" class="add-bar-btn" id="addRandomBtn">Add random candidates</button>
+                                <div style="position: relative; flex: 1;">
+                                    <button type="button" class="add-bar-btn">＋ Add a candidate</button>
+                                    <input type="file" id="addInput" accept="image/*" multiple style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="cta" id="submitBtn" style="margin-top:1.5rem;">
+                        <span class="btn-inner" id="btnInner">💘 Find Best Match</span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="mode-section" id="mode-suitability">
+                <form id="compareForm" autocomplete="off">
+                    <div class="panels" style="display:flex; flex-direction:column; gap:1rem;">
+                        <div class="card" id="partner1Card">
+                            <div class="section-label">💎 Partner 1</div>
+                            <div class="partner-drop" id="partner1Drop">
+                                <div class="icon">📷</div>
+                                <div class="label">Upload picture</div>
+                                <input type="file" id="partner1Input" accept="image/*" required>
+                            </div>
+                            <div class="partner-preview" id="partner1Preview">
+                                <img id="partner1Img" alt="Partner 1">
+                                <button type="button" class="change-btn" id="changePartner1Btn">Change</button>
+                            </div>
+                        </div>
+                        <div class="card" id="partner2Card">
+                            <div class="section-label">💎 Partner 2</div>
+                            <div class="partner-drop" id="partner2Drop">
+                                <div class="icon">📷</div>
+                                <div class="label">Upload picture</div>
+                                <input type="file" id="partner2Input" accept="image/*" required>
+                            </div>
+                            <div class="partner-preview" id="partner2Preview">
+                                <img id="partner2Img" alt="Partner 2">
+                                <button type="button" class="change-btn" id="changePartner2Btn">Change</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="cta" id="compareBtn" style="margin-top:1.5rem;">
+                        <span class="btn-inner" id="compareBtnInner">💘 Calculate Suitability</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="error-banner" id="errorBanner"></div>
+
+        <!-- Progress -->
+        <div class="progress-panel" id="progressPanel">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-status" id="progressStatus"></div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-panel" id="resultPanel">
+            <div class="particles" id="particles"></div>
+            <div class="result-emoji" id="resultEmoji"></div>
+            <div class="result-title" id="resultTitle"></div>
+            <div class="result-sub" id="resultSub"></div>
+            <div class="match-wrap hidden" id="matchWrap">
+                <div class="couple-container">
+                    <img class="match-img partner" id="resultPartnerImg" alt="Partner">
+                    <div class="couple-icon">💖</div>
+                    <img class="match-img candidate" id="matchImg" alt="Match">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/matcher.js"></script>
+</body>
+
+</html>

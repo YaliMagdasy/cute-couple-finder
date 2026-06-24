@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Link - Cute Couple Finder</title>
+    <meta name="description" content="Upload photos to create your unique shareable link.">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <!-- Floating hearts background -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <div class="app">
+
+        <!-- Top Navigation -->
+        <nav
+            style="padding: 1rem 0; margin-bottom: 2rem; border-bottom: 1px solid rgba(244,63,94,0.15); display: flex; align-items: center; justify-content: space-between;">
+            <a href="/"
+                style="text-decoration: none; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.95rem; transition: color 0.2s ease;">
+                <span style="font-size: 1.2rem;">←</span> Back to Home
+            </a>
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
+                💕 Setup
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header class="header" style="margin-top: 1rem; margin-bottom: 2rem;">
+            <h1 style="font-size: 2.2rem;">Create Your Surprise</h1>
+            <p class="subtitle">Upload your photos below 💘</p>
+            <div
+                style="margin-top: 1.5rem; background: rgba(244,63,94,0.05); border: 1px solid rgba(244,63,94,0.1); border-radius: 12px; padding: 0.8rem 1.2rem; display: inline-block;">
+                <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary);">
+                    Still unsure how it works? <a href="/demo"style="color: var(--primary); text-decoration: none; font-weight: 600;">Check out the demo ✨</a>
+                </p>
+            </div>
+        </header>
+
+        <!-- Upload Form -->
+        <div id="setupSection">
+            <form id="setupForm" autocomplete="off">
+                <div class="upload-grid">
+
+                    <!-- Person 1 (You) -->
+                    <div class="upload-card" id="p1Card">
+                        <div class="section-label">
+                            <span>💜</span> You (Person 1)
+                            <span class="photo-count" id="p1Count">0 photos</span>
+                        </div>
+                        <div class="drop-zone" id="p1Drop">
+                            <div class="drop-icon">📷</div>
+                            <div class="drop-label">Drop your photos here</div>
+                            <div class="drop-hint">or click to browse</div>
+                            <input type="file" id="p1Input" accept="image/*" multiple>
+                        </div>
+                        <div class="preview-grid" id="p1Preview"></div>
+                    </div>
+
+                    <!-- Person 2 (Your Partner) -->
+                    <div class="upload-card" id="p2Card">
+                        <div class="section-label">
+                            <span>💖</span> Your Partner (Person 2)
+                            <span class="photo-count" id="p2Count">0 photos</span>
+                        </div>
+                        <div class="drop-zone" id="p2Drop">
+                            <div class="drop-icon">📷</div>
+                            <div class="drop-label">Drop their photos here</div>
+                            <div class="drop-hint">or click to browse</div>
+                            <input type="file" id="p2Input" accept="image/*" multiple>
+                        </div>
+                        <div class="preview-grid" id="p2Preview"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="cta" id="setupBtn">
+                    <span class="btn-inner" id="setupBtnInner">💘 Create the Surprise</span>
+                </button>
+            </form>
+
+            <div class="error-banner" id="errorBanner"></div>
+
+            <!-- Progress -->
+            <div class="progress-panel" id="progressPanel">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-status" id="progressStatus"></div>
+            </div>
+
+            <!-- Privacy notice -->
+            <div class="privacy-notice">
+                <span class="privacy-icon">🔒</span>
+                <span class="privacy-text">
+                    <strong>Your privacy matters.</strong> Uploaded photos are used only to train your custom model
+                    and are never stored. The generated link expires automatically after 24 hours.
+                </span>
+            </div>
+        </div>
+
+        <!-- Success state -->
+        <div class="success-panel" id="successPanel">
+            <div class="success-emoji">🎉</div>
+            <div class="success-title">Your Surprise is Ready!</div>
+            <div class="success-sub">Send this link to your partner. When they open it, the AI will match you two as the
+                cutest couple - no matter what. 💕</div>
+            <div class="url-box">
+                <span class="url-text" id="generatedUrl"></span>
+                <button type="button" class="copy-btn" id="copyBtn">Copy</button>
+            </div>
+            <div class="expiry-badge" id="expiryBadge">
+                ⏳ <span id="expiryTime">Expires in 24 hours</span>
+            </div>
+            <button type="button" class="create-another-btn" id="createAnotherBtn">
+                ✨ Create Another
+            </button>
+        </div>
+    </div>
+
+    <script src="/js/landing.js"></script>
+</body>
+
+</html>
